@@ -5,4 +5,3 @@ require "wordgraph/cli"
 
 cli = Wordgraph::CLI.new
 options = cli.parse(ARGV)
-puts options

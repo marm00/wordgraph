@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "optparse"
+require_relative "core"
 
 module Wordgraph
   class CLI
@@ -10,7 +11,7 @@ module Wordgraph
 
     def parse(args)
       parser = OptionParser.new do |opts|
-        opts.banner = "Usage: cli.rb [options] ARG..."
+        opts.banner = "E.g.: wordgraph [options] ARG..."
         opts.separator ""
         opts.separator "Specific options:"
 
@@ -21,16 +22,19 @@ module Wordgraph
         opts.on("-h", "--help", "Prints this help") do
           puts opts
           puts args
-          exit
         end
       end
 
       begin
-        parser.parse!(args)
+        files = parser.parse!(args)
+        core = Core.new(files, @options[:verbose])
+        core.process
       rescue OptionParser::InvalidOption => e
         puts e.message
         puts parser
         exit 1
+      rescue ArgumentError => e
+        puts "Invalid argument: #{e}"
       end
 
       @options
