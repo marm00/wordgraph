@@ -3,7 +3,7 @@
 
 lib = File.expand_path("../lib/", __FILE__)
 $LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
-require_relative "wordgraph/version"
+require "wordgraph/version"
 
 Gem::Specification.new do |spec|
   spec.name = "wordgraph"
