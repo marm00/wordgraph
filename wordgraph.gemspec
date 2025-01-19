@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.1.0"
 
-  spec.files = %w(.document wordgraph.gemspec) + Dir["*.md", "bin/*", "lib/**/*.rb"]
+  spec.files = %w(.document wordgraph.gemspec) + Dir["*.md", "bin/*", "lib/**/*.rb", "fixtures/**/*"]
   spec.executables = %w(wordgraph)
   spec.require_paths = %w(lib)
 
