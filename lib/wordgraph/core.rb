@@ -3,6 +3,7 @@ module Wordgraph
     def initialize(files, verbose=false)
       @files = files
       @verbose = verbose
+      @max_fontsize = 20
     end
 
     def tokenize(word)
@@ -15,6 +16,25 @@ module Wordgraph
       return word
     end
 
+    def generate_cloud(tokens)
+      # https://en.wikipedia.org/wiki/Tag_cloud
+      raise ArgumentError, "Empty tokens map" if tokens.length <= 0
+      # Linear normalization
+      min_count = tokens.values.min
+      max_count = tokens.values.max
+      max_sub_min = [max_count - min_count, 1].max
+      tokens.each do |token, count|
+        size = count <= min_count ? 
+                1 : 
+                ((@max_fontsize * (count - min_count)) / max_sub_min).ceil 
+        tokens[token] = {
+          count: count,
+          size: size
+        }
+      end
+      puts tokens
+    end
+
     def process_text(file)
       puts "Processing txt file #{file}" if @verbose
       count = {}
@@ -25,7 +45,15 @@ module Wordgraph
           count[tokenized] += 1
         end
       end
-      puts "Succesfully finished processing" if @verbose
+      puts count if @verbose
+
+      begin
+      self.generate_cloud(count)
+      rescue ArgumentError => e
+        raise e
+      else
+        puts "Succesfully finished processing" if @verbose
+      end
       return count
     end
 
