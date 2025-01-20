@@ -5,22 +5,36 @@ module Wordgraph
       @verbose = verbose
     end
 
+    def tokenize(word)
+      # Lowercase
+      word = word.downcase
+      # Strip trailing punctuation at word start
+      word = word.sub(/^[\.,;:!?'"`(\[\{<]/, "")
+      # Strip trailing punctuation at word end
+      word = word.sub(/[\.,;:!?'"`)\]\}>]\z/, "")
+      return word
+    end
+
+    def process_text(file)
+      puts "Processing txt file #{file}" if @verbose
+      count = {}
+      count.default = 0
+      IO.foreach(file) do |line|
+        line.split do |word|
+          tokenized = self.tokenize(word)
+          count[tokenized] += 1
+        end
+      end
+      puts "Succesfully finished processing" if @verbose
+      return count
+    end
+
     def process
       puts "Processing #{@files}" if @verbose
-
-      @files.each do |f|
+      Array(@files).each do |f|
         case f
         when /\.(txt|text)\z/i
-          puts "Processing txt file #{f}"
-          count = {}
-          count.default = 0
-          IO.foreach(f) do |line|
-            line.split do |word|
-              count[word] += 1
-            end
-          end
-          puts count
-          puts "Succesfully finished processing"
+          return self.process_text(f)
         when /\.docx\z/i
           raise ArgumentError, "docx not supported yet."
         else
