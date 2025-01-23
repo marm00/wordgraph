@@ -48,6 +48,7 @@ module Wordgraph
       raise ArgumentError, "File already exists, either overwrite or change name" unless continue_exists
       File.open(out, File::RDWR | File::CREAT) do |f|
         f.flock(File::LOCK_EX)
+        f.truncate(0)
         document_setup = <<~HTML
           <!DOCTYPE html>
           <html lang="en">
@@ -57,7 +58,11 @@ module Wordgraph
               <title>wordgraph</title>
           </head>
           <body>
-            #{tokens.map { |k, v| "<span title='" + v[:count].to_s + "'>" + k + "</span>"}.join("\n\s\s")}
+            #{tokens.map { |k, v| \
+                "<span title='" + v[:count].to_s + "' style=\"" + "font-size: " + v[:size].to_s + "px;\">" \
+                 + k + \
+                "</span>"} \
+              .join("\n\s\s")}
           </body>
           <style>
             body {
