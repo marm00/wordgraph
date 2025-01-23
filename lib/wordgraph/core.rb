@@ -1,6 +1,7 @@
 module Wordgraph
   class Core
-    def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", overwrite: false, seed: nil, nlargest: nil)
+    def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", 
+                    overwrite: false, seed: nil, nlargest: nil, font: "times")
       @files = files
       @verbose = verbose
       @output_directory = output_directory
@@ -11,6 +12,7 @@ module Wordgraph
       @max_size = 20
       @min_font_size = 12;
       @max_font_size = 48;
+      @font = font.downcase
       if @verbose
         puts "Proceeding with settings:"
         self.instance_variables.each do |var|
@@ -37,6 +39,7 @@ module Wordgraph
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
+      tokens = tokens.max_by(@nlargest) { |v| v }.to_h if @nlargest
       tokens.each do |token, count|
         size = count <= min_count ? 
                 1 : 
@@ -46,7 +49,6 @@ module Wordgraph
           size: size
         }
       end
-      tokens = tokens.max_by(@nlargest) { |_, v| v[:count] }.to_h if @nlargest
       self.write_html(tokens)
     end
 
@@ -107,6 +109,7 @@ module Wordgraph
               line-height: 1.6;
               margin: 0;
               padding: 20px;
+              font-family: #{@font};
             }
             span {
               display: inline-block;

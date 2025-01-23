@@ -44,6 +44,11 @@ module Wordgraph
         opts.on("-m=INTEGER", "--nlargest=INTEGER", "Maximum amount of words in graph", Integer) do |nlargest|
           @options[:nlargest] = nlargest
         end
+
+        opts.on("--font=STRING", ["times", "georgia", "garamond", "arial", 
+                "helvetica", "verdana", "courier", "cursive", "papyrus"]) do |font|
+          @options[:font] = font
+        end
       end
 
       begin
