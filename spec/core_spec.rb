@@ -6,7 +6,7 @@ RSpec.describe Wordgraph::Core do
   let(:examples_path) {  "spec/fixtures/examples/" }
   def sample(file_name)
     file_path = examples_path + "sample#{file_name}.txt"
-    core = Wordgraph::Core.new(file_path, false)
+    core = Wordgraph::Core.new(file_path)
     def core.generate_cloud _
       return
     end

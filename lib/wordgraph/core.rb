@@ -46,10 +46,9 @@ module Wordgraph
     end
 
     def get_path
-      out_dir = @output_directory || Dir.pwd
-      raise ArgumentError, "Output directory: #{@out_dir} not found" if !Dir.exist?(out_dir)
-      out_file = File.basename(@name || "wordgraph") + ".html"
-      out = File.join(out_dir, out_file)
+      raise ArgumentError, "Output directory: #{@output_directory} not found" if !Dir.exist?(@output_directory)
+      file_name = File.basename(@name) + ".html"
+      out = File.join(@output_directory, file_name)
       puts "Creating file: #{out}"
       stop_exists = File.exist?(out) && !@overwrite
       raise ArgumentError, "Output file already exists, either overwrite or change the name" if stop_exists
