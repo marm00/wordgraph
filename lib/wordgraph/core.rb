@@ -32,6 +32,7 @@ module Wordgraph
       # https://en.wikipedia.org/wiki/Tag_cloud
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
+      # TODO: logarithmic function for larger texts
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
@@ -81,13 +82,17 @@ module Wordgraph
               <title>wordgraph</title>
           </head>
           <body>
-            #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v| \
-                fs = self.remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
-                "<span title='" + v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "") \
-                  + "' style=\"" + "font-size: " + fs.to_s + "px;\">" \
-                  + k + \
-                "</span>"} \
-              .join("\n\s\s")}
+            #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v|
+              fs = self.remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
+              title = v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "")
+              <<~HTML.strip
+                <span
+                    title='#{title}'
+                    style='font-size: #{fs}px;'
+                    aria-role='listitem'
+                    aria-label='#{title}'>#{k}</span>
+              HTML
+            }.join("\n\s\s")}
           </body>
           <style>
             body {
