@@ -1,12 +1,20 @@
 module Wordgraph
   class Core
-    def initialize(files, verbose=false, output_directory = nil, name = nil, overwrite=false)
+    # TODO: unpacking not working correctly
+    def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", overwrite: false, seed: nil)
       @files = files
       @verbose = verbose
-      @max_fontsize = 20
       @output_directory = output_directory
       @name = name
       @overwrite = overwrite
+      @seed = seed
+      @max_fontsize = 20
+      if @verbose
+        puts "Proceeding with settings:"
+        self.instance_variables.each do |var|
+          puts "#{var}: #{self.instance_variable_get(var) || false}"
+        end  
+      end
     end
 
     def tokenize(word)
@@ -38,14 +46,19 @@ module Wordgraph
       self.write_html(tokens)
     end
 
-    def write_html(tokens)
+    def get_path
       out_dir = @output_directory || Dir.pwd
-      raise ArgumentError, "Output directory: #{@out_dir} not found" unless Dir.exist?(out_dir)
+      raise ArgumentError, "Output directory: #{@out_dir} not found" if !Dir.exist?(out_dir)
       out_file = File.basename(@name || "wordgraph") + ".html"
       out = File.join(out_dir, out_file)
       puts "Creating file: #{out}"
-      continue_exists = @overwrite || !File.exist?(out)
-      raise ArgumentError, "File already exists, either overwrite or change name" unless continue_exists
+      stop_exists = File.exist?(out) && !@overwrite
+      raise ArgumentError, "Output file already exists, either overwrite or change the name" if stop_exists
+      return out
+    end
+
+    def write_html(tokens)
+      out = self.get_path
       File.open(out, File::RDWR | File::CREAT) do |f|
         f.flock(File::LOCK_EX)
         f.truncate(0)
@@ -58,9 +71,9 @@ module Wordgraph
               <title>wordgraph</title>
           </head>
           <body>
-            #{tokens.map { |k, v| \
+            #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v| \
                 "<span title='" + v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "") \
-                  +  "' style=\"" + "font-size: " + v[:size].to_s + "px;\">" \
+                  +  "' style=\"" + "font-size: " + (v[:size] + 8).to_s + "px;\">" \
                   + k + \
                 "</span>"} \
               .join("\n\s\s")}
@@ -83,7 +96,7 @@ module Wordgraph
         HTML
         f.write(document_setup)
       end
-      puts File.read(out)
+      puts File.read(out) if @verbose
     end
 
     def process_text(file)
@@ -108,7 +121,6 @@ module Wordgraph
     end
 
     def process
-      puts "Processing #{@files}" if @verbose
       Array(@files).each do |f|
         case f
         when /\.(txt|text)\z/i

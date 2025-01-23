@@ -15,13 +15,13 @@ module Wordgraph
         opts.separator ""
         opts.separator "Specific options:"
 
-        opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
-          @options[:verbose] = v
-        end
-
         opts.on("-h", "--help", "Prints this help") do
           puts opts
           puts args
+        end
+        
+        opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+          @options[:verbose] = v
         end
 
         opts.on("-o=STRING" "--output-directory=STRING", "Directory to output files", String) do |dir|
@@ -36,11 +36,15 @@ module Wordgraph
         opts.on("--[no-]overwrite", "Overwrite output file") do |overwrite|
           @options[:overwrite] = overwrite
         end
+
+        opts.on("-s=INTEGER", "--seed=INTEGER", Integer) do |seed|
+          @options[:seed] = seed
+        end
       end
 
       begin
         files = parser.parse!(args)
-        core = Core.new(files, @options[:verbose], @options[:output_directory], @options[:name], @options[:overwrite])
+        core = Core.new(files, **@options)
         core.process
       rescue OptionParser::InvalidOption => e
         puts e.message
