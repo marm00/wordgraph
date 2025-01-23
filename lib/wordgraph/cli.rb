@@ -37,7 +37,7 @@ module Wordgraph
           @options[:overwrite] = overwrite
         end
 
-        opts.on("-s=INTEGER", "--seed=INTEGER", Integer) do |seed|
+        opts.on("-s=INTEGER", "--seed=INTEGER", "Deterministic word order", Integer) do |seed|
           @options[:seed] = seed
         end
       end

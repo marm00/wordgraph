@@ -7,7 +7,9 @@ module Wordgraph
       @name = name
       @overwrite = overwrite
       @seed = seed
-      @max_fontsize = 20
+      @max_size = 20
+      @min_font_size = 12;
+      @max_font_size = 48;
       if @verbose
         puts "Proceeding with settings:"
         self.instance_variables.each do |var|
@@ -36,7 +38,7 @@ module Wordgraph
       tokens.each do |token, count|
         size = count <= min_count ? 
                 1 : 
-                ((@max_fontsize * (count - min_count)) / max_sub_min).ceil 
+                ((@max_size * (count - min_count)) / max_sub_min).ceil 
         tokens[token] = {
           count: count,
           size: size
@@ -55,6 +57,16 @@ module Wordgraph
       return out
     end
 
+    def remap(from_min, from_max, to_min, to_max, value)
+      def lerp(a, b, t)
+        return (1 - t) * a + b * t
+      end
+      def invLerp(a, b, v)
+        return a === b ? 0 : (v - a).to_f / (b - a)
+      end
+      return lerp(to_min, to_max, invLerp(from_min, from_max, value))
+    end
+
     def write_html(tokens)
       out = self.get_path
       File.open(out, File::RDWR | File::CREAT) do |f|
@@ -70,8 +82,9 @@ module Wordgraph
           </head>
           <body>
             #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v| \
+                fs = self.remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
                 "<span title='" + v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "") \
-                  +  "' style=\"" + "font-size: " + (v[:size] + 8).to_s + "px;\">" \
+                  + "' style=\"" + "font-size: " + fs.to_s + "px;\">" \
                   + k + \
                 "</span>"} \
               .join("\n\s\s")}
@@ -81,7 +94,7 @@ module Wordgraph
               background-color: #000;
               color: #FFFFFF;
               text-align: center;
-              line-height: 2;
+              line-height: 1.2;
               margin: 0;
             }
             span {
