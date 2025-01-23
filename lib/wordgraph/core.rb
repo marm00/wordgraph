@@ -13,9 +13,9 @@ module Wordgraph
       # Lowercase
       word = word.downcase
       # Strip trailing punctuation at word start
-      word = word.sub(/^[\.,;:!?'"`(\[\{<]/, "")
+      word = word.sub(/^[\.,;:!?'"`(\[\{<]+/, "")
       # Strip trailing punctuation at word end
-      word = word.sub(/[\.,;:!?'"`)\]\}>]\z/, "")
+      word = word.sub(/[\.,;:!?'"`)\]\}>]+$/, "")
       return word
     end
 
@@ -59,8 +59,9 @@ module Wordgraph
           </head>
           <body>
             #{tokens.map { |k, v| \
-                "<span title='" + v[:count].to_s + "' style=\"" + "font-size: " + v[:size].to_s + "px;\">" \
-                 + k + \
+                "<span title='" + v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "") \
+                  +  "' style=\"" + "font-size: " + v[:size].to_s + "px;\">" \
+                  + k + \
                 "</span>"} \
               .join("\n\s\s")}
           </body>
