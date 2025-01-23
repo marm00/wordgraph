@@ -41,7 +41,7 @@ module Wordgraph
     def write_html(tokens)
       out_dir = @output_directory || Dir.pwd
       raise ArgumentError, "Output directory: #{@out_dir} not found" unless Dir.exist?(out_dir)
-      out_file = File.basename(@name || "graph") + ".html"
+      out_file = File.basename(@name || "wordgraph") + ".html"
       out = File.join(out_dir, out_file)
       puts "Creating file: #{out}"
       continue_exists = @overwrite || !File.exist?(out)
@@ -57,7 +57,22 @@ module Wordgraph
               <title>wordgraph</title>
           </head>
           <body>
+            #{tokens.map { |k, v| "<span title='" + v[:count].to_s + "'>" + k + "</span>"}.join("\n\s\s")}
           </body>
+          <style>
+            body {
+              background-color: #000;
+              color: #FFFFFF;
+              text-align: center;
+              line-height: 2;
+              margin: 0;
+            }
+            span {
+              margin: 4px;
+              padding: 4px 8px;
+              display: inline-block;
+            }
+          </style>
           </html>
         HTML
         f.write(document_setup)
