@@ -1,6 +1,5 @@
 module Wordgraph
   class Core
-    # TODO: unpacking not working correctly
     def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", overwrite: false, seed: nil)
       @files = files
       @verbose = verbose
