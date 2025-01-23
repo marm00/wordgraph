@@ -1,12 +1,13 @@
 module Wordgraph
   class Core
-    def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", overwrite: false, seed: nil)
+    def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", overwrite: false, seed: nil, nlargest: nil)
       @files = files
       @verbose = verbose
       @output_directory = output_directory
       @name = name
       @overwrite = overwrite
       @seed = seed
+      @nlargest = nlargest
       @max_size = 20
       @min_font_size = 12;
       @max_font_size = 48;
@@ -45,6 +46,7 @@ module Wordgraph
           size: size
         }
       end
+      tokens = tokens.max_by(@nlargest) { |_, v| v[:count] }.to_h if @nlargest
       self.write_html(tokens)
     end
 

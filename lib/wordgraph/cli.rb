@@ -40,6 +40,10 @@ module Wordgraph
         opts.on("-s=INTEGER", "--seed=INTEGER", "Deterministic word order", Integer) do |seed|
           @options[:seed] = seed
         end
+
+        opts.on("-m=INTEGER", "--nlargest=INTEGER", "Maximum amount of words in graph", Integer) do |nlargest|
+          @options[:nlargest] = nlargest
+        end
       end
 
       begin
