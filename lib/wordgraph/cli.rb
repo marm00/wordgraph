@@ -23,11 +23,24 @@ module Wordgraph
           puts opts
           puts args
         end
+
+        opts.on("-o=STRING" "--output-directory=STRING", "Directory to output files", String) do |dir|
+          # Supports /mnt/[:drive_letter]/[:directory]
+          @options[:output_directory] = dir
+        end
+
+        opts.on("-n=STRING", "--name=STRING", "Output file name", String) do |name|
+          @options[:name] = name
+        end
+
+        opts.on("--[no-]overwrite", "Overwrite output file") do |overwrite|
+          @options[:overwrite] = overwrite
+        end
       end
 
       begin
         files = parser.parse!(args)
-        core = Core.new(files, @options[:verbose])
+        core = Core.new(files, @options[:verbose], @options[:output_directory], @options[:name], @options[:overwrite])
         core.process
       rescue OptionParser::InvalidOption => e
         puts e.message
