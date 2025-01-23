@@ -96,16 +96,21 @@ module Wordgraph
           </body>
           <style>
             body {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              justify-content: center;
               background-color: #000;
               color: #FFFFFF;
-              text-align: center;
-              line-height: 1.2;
+              line-height: 1.6;
               margin: 0;
+              padding: 20px;
             }
             span {
-              margin: 4px;
-              padding: 4px 8px;
               display: inline-block;
+              margin: 2px 6px;
+              padding: 4px 12px;
+              border-radius: 4px;
             }
           </style>
           </html>
