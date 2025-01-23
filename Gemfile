@@ -7,3 +7,5 @@ gem "rake", "~> 13.0"
 gem "rspec", "~> 3.0"
 
 gemspec
+
+gem "rubyzip", "~> 2.4"

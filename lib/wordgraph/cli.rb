@@ -24,7 +24,7 @@ module Wordgraph
           @options[:verbose] = v
         end
 
-        opts.on("-o=STRING" "--output-directory=STRING", "Directory to output files", String) do |dir|
+        opts.on("-o=STRING", "--output-directory=STRING", "Directory to output files", String) do |dir|
           # Supports /mnt/[:drive_letter]/[:directory]
           @options[:output_directory] = dir
         end
@@ -46,7 +46,8 @@ module Wordgraph
         end
 
         opts.on("--font=STRING", ["times", "georgia", "garamond", "arial", 
-                "helvetica", "verdana", "courier", "cursive", "papyrus"]) do |font|
+                "helvetica", "verdana", "courier", "cursive", "papyrus"], 
+                "Use a web safe font", String) do |font|
           @options[:font] = font
         end
       end

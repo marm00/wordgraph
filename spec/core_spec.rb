@@ -4,8 +4,8 @@ require "wordgraph/core"
 
 RSpec.describe Wordgraph::Core do
   let(:examples_path) {  "spec/fixtures/examples/" }
-  def sample(file_name)
-    file_path = examples_path + "sample#{file_name}.txt"
+  def sample(file_name, ext=nil)
+    file_path = examples_path + "sample#{file_name}.#{ext || "txt"}"
     core = Wordgraph::Core.new(file_path)
     def core.generate_cloud _
       return
@@ -38,5 +38,9 @@ RSpec.describe Wordgraph::Core do
       "a" => 1, "b" => 1, "c" => 1, "d" => 1, 
       "e" => 1, "f" => 1, "g" => 1, "h" => 1
     })
+  end
+
+  it "process docx file" do
+    expect(sample(0, "docx")).to eq({"a" => 1, "b" => 1, "c" => 1})
   end
 end

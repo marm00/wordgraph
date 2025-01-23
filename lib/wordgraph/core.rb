@@ -125,11 +125,10 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
-    def process_text(file)
-      puts "Processing txt file #{file}" if @verbose
+    def process_lines(lines)
       count = {}
       count.default = 0
-      IO.foreach(file) do |line|
+      lines.each do |line|
         line.split do |word|
           tokenized = self.tokenize(word)
           count[tokenized] += 1
@@ -146,13 +145,32 @@ module Wordgraph
       return count
     end
 
+    def process_text(file)
+      puts "Processing txt file #{file}" if @verbose
+      lines = IO.readlines(file)
+      return self.process_lines(lines)
+    end
+
+    def process_docx(file)
+      require "zip"
+      puts "Processing docx file #{file}" if @verbose
+      binary = File.open(file, 'rb') { |f| f.read }
+      Zip::File.open_buffer(binary) do |zip|
+        doc = zip.find { |entry| entry.name == 'word/document.xml'}
+        text = doc.get_input_stream.read
+        # TODO: check if styling is supported
+        lines = text.scan(/(?<=<w:t>).+?(?=<\/w:t>)/)
+        return self.process_lines(lines)
+      end
+    end
+
     def process
       Array(@files).each do |f|
         case f
         when /\.(txt|text)\z/i
           return self.process_text(f)
         when /\.docx\z/i
-          raise ArgumentError, "docx not supported yet."
+          return self.process_docx(f)
         else
           raise ArgumentError, "File type not supported."
         end
