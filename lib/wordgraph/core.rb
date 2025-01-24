@@ -44,8 +44,8 @@ module Wordgraph
       tokens = tokens.max_by(@nlargest) { |v| v }.to_h if @nlargest
       tokens.each do |token, count|
         size = count <= min_count ? 
-                1 : 
-                ((@max_size * (count - min_count)) / max_sub_min).ceil 
+          1 : 
+          [((@max_size * (count - min_count)) / max_sub_min).ceil, 1].max
         tokens[token] = {
           count: count,
           size: size
@@ -64,16 +64,6 @@ module Wordgraph
       return out
     end
 
-    def remap(from_min, from_max, to_min, to_max, value)
-      def lerp(a, b, t)
-        return (1 - t) * a + b * t
-      end
-      def invLerp(a, b, v)
-        return a === b ? 0 : (v - a).to_f / (b - a)
-      end
-      return lerp(to_min, to_max, invLerp(from_min, from_max, value))
-    end
-
     def write_html(tokens)
       out = self.get_path
       File.open(out, File::RDWR | File::CREAT) do |f|
@@ -89,8 +79,8 @@ module Wordgraph
           </head>
           <body>
             #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v|
-              fs = remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
-              title = "#{v[:count].to_s} occurrence #{(v[:count] > 1 ) ? "s" : ""}"
+              fs = Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
+              title = "#{v[:count].to_s} occurrence#{(v[:count] > 1 ) ? "s" : ""}"
               <<~HTML.strip
                 <span
                     title='#{title}'
