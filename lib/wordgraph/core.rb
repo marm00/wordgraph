@@ -1,3 +1,5 @@
+require_relative "mathwg"
+
 module Wordgraph
   class Core
     def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", 
@@ -87,8 +89,8 @@ module Wordgraph
           </head>
           <body>
             #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v|
-              fs = self.remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
-              title = v[:count].to_s + " occurrence" + ((v[:count] > 1 ) ? "s" : "")
+              fs = remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
+              title = "#{v[:count].to_s} occurrence #{(v[:count] > 1 ) ? "s" : ""}"
               <<~HTML.strip
                 <span
                     title='#{title}'
