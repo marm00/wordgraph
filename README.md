@@ -2,6 +2,14 @@
 
 TODO: Description
 
+## Prerequisities
+
+### ImageMagick
+
+- Version 7.1.1 or later (7.x.x).
+
+You can get ImageMagick from <https://imagemagick.org/script/download.php>.
+
 ## Installation
 
 TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.

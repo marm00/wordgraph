@@ -1,3 +1,4 @@
+require "rmagick"
 require_relative "mathwg"
 
 module Wordgraph

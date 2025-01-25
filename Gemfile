@@ -9,3 +9,5 @@ gem "rspec", "~> 3.0"
 gemspec
 
 gem "rubyzip", "~> 2.4"
+
+gem "rmagick", "~> 6.1"
