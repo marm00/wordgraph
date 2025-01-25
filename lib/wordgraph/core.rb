@@ -30,7 +30,6 @@ module Wordgraph
       word = word.sub(/^[\.,;:!?'"`(\[\{<]+/, "")
       # Strip trailing punctuation at word end
       word = word.sub(/[\.,;:!?'"`)\]\}>]+$/, "")
-      return word
     end
 
     def generate_cloud(tokens)
@@ -55,13 +54,13 @@ module Wordgraph
     end
 
     def get_path
-      raise ArgumentError, "Output directory: #{@output_directory} not found" if !Dir.exist?(@output_directory)
+      raise ArgumentError, "Output directory: #{@output_directory} not found" unless Dir.exist?(@output_directory)
       file_name = File.basename(@name) + ".html"
       out = File.join(@output_directory, file_name)
       puts "Creating file: #{out}"
-      stop_exists = File.exist?(out) && !@overwrite
-      raise ArgumentError, "Output file already exists, either overwrite or change the name" if stop_exists
-      return out
+      continue_exists = @overwrite || !File.exist?(out)
+      raise ArgumentError, "Output file already exists, either overwrite or change the name" unless continue_exists
+      out
     end
 
     def write_html(tokens)
@@ -134,13 +133,13 @@ module Wordgraph
       else
         puts "Succesfully finished processing" if @verbose
       end
-      return count
+      count
     end
 
     def process_text(file)
       puts "Processing txt file #{file}" if @verbose
       lines = IO.readlines(file)
-      return self.process_lines(lines)
+      self.process_lines(lines)
     end
 
     def process_docx(file)

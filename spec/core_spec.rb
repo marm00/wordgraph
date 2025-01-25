@@ -8,9 +8,8 @@ RSpec.describe Wordgraph::Core do
     file_path = examples_path + "sample#{file_name}.#{ext || "txt"}"
     core = Wordgraph::Core.new(file_path)
     def core.generate_cloud _
-      return
     end
-    return core.process
+    core.process
   end
 
   it "process one letter" do
