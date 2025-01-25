@@ -1,5 +1,7 @@
 require "rmagick"
+require "ttfunk"
 require_relative "mathwg"
+require_relative "ttfmetrics"
 
 module Wordgraph
   class Core
@@ -15,7 +17,12 @@ module Wordgraph
       @max_size = 20
       @min_font_size = 12;
       @max_font_size = 48;
-      @font = font.downcase
+      @font_name = font.downcase
+      # TODO: turn below into params
+      # @font = "/usr/share/fonts/truetype/lato/Lato-Regular.ttf"
+      @font = "/usr/share/fonts/truetype/Iosevka-Regular.ttc" # Mono font. 1 = Term
+      @ttc_index = 1
+      @metrics = TTFMetrics.new(@font, @ttc_index)
       if @verbose
         puts "Proceeding with settings:"
         self.instance_variables.each do |var|
@@ -101,7 +108,7 @@ module Wordgraph
               line-height: 1.6;
               margin: 0;
               padding: 20px;
-              font-family: #{@font};
+              font-family: #{@font_name};
             }
             span {
               display: inline-block;
@@ -117,9 +124,10 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
-    def spiral_pack(tokens)
+    # TODO: remove rmagick dependency
+    def rmagick_metrics(tokens)
       glyph = Magick::Draw.new
-      glyph.font = @font
+      glyph.font = @font_name
       glyph.fill = 'white'
       glyph.stroke = ''
       tokens.each do |token, v|
@@ -131,10 +139,15 @@ module Wordgraph
         # This property is useful for placement; word frequency = height.
         # Note that for width this is not the case, even if the font is monospace.
         # E.g. a group of fs=1 and length=5 has a width of (35|36) with font=courier.
-        # TODO: this is slow, look into caching or TTFunk
+        # TODO: if using this function, this is slow, look into caching or TTFunk
         metrics = glyph.get_type_metrics(token)
         puts "#{metrics[:width]} #{metrics[:height]} #{v[:size]} #{token.length}"
       end
+    end
+
+    def spiral_pack(tokens)
+      tokens.each { |token, v| @metrics.measure_token(token, 
+      Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor, v[:count]) } 
     end
 
     def process_lines(lines)
