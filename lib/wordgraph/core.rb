@@ -38,7 +38,7 @@ module Wordgraph
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
       # TODO: logarithmic function for larger texts
-      tokens = tokens.max_by(@nlargest) { |v| v }.to_h if @nlargest
+      tokens = tokens.sort_by { |_,v| -v }[0..@nlargest].to_h
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
