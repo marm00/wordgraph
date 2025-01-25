@@ -6,7 +6,7 @@ TODO: Description
 
 ### ImageMagick
 
-- Version 7.1.1 or later (7.x.x).
+- Version 7.1.1 or later (7.x.x). Required for RMagick (version 6.1 or later).
 
 You can get ImageMagick from <https://imagemagick.org/script/download.php>.
 

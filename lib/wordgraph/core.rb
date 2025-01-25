@@ -38,10 +38,10 @@ module Wordgraph
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
       # TODO: logarithmic function for larger texts
+      tokens = tokens.max_by(@nlargest) { |v| v }.to_h if @nlargest
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
-      tokens = tokens.max_by(@nlargest) { |v| v }.to_h if @nlargest
       tokens.each do |token, count|
         size = count <= min_count ? 
           1 : 
