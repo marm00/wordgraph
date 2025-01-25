@@ -33,12 +33,12 @@ module Wordgraph
       word = word.sub(/[\.,;:!?'"`)\]\}>]+$/, "")
     end
 
-    def generate_cloud(tokens)
+    def calculate_sizes(tokens)
       # https://en.wikipedia.org/wiki/Tag_cloud
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
       # TODO: logarithmic function for larger texts
-      tokens = tokens.sort_by { |_,v| -v }[0..@nlargest].to_h
+      tokens = tokens.sort_by { |_,v| -v }.first(@nlargest).to_h
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
@@ -51,7 +51,7 @@ module Wordgraph
           size: size
         }
       end
-      self.write_html(tokens)
+      tokens
     end
 
     def get_path
@@ -64,7 +64,7 @@ module Wordgraph
       out
     end
 
-    def write_html(tokens)
+    def write_html_simple(tokens)
       out = self.get_path
       File.open(out, File::RDWR | File::CREAT) do |f|
         f.flock(File::LOCK_EX)
@@ -117,6 +117,26 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
+    def spiral_pack(tokens)
+      glyph = Magick::Draw.new
+      glyph.font = @font
+      glyph.fill = 'white'
+      glyph.stroke = ''
+      tokens.each do |token, v|
+        fs = Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
+        glyph.pointsize = fs
+        # Every token with the same pointsize will share the same height glyph,
+        # regardless of the letters/glyphs present in their strings.
+        # E.g. a group of fs=1 will uniformly have a height of 16.0 with font=times.
+        # This property is useful for placement; word frequency = height.
+        # Note that for width this is not the case, even if the font is monospace.
+        # E.g. a group of fs=1 and length=5 has a width of (35|36) with font=courier.
+        # TODO: this is slow, look into caching or TTFunk
+        metrics = glyph.get_type_metrics(token)
+        puts "#{metrics[:width]} #{metrics[:height]} #{v[:size]} #{token.length}"
+      end
+    end
+
     def process_lines(lines)
       count = {}
       count.default = 0
@@ -128,7 +148,11 @@ module Wordgraph
       end
       begin
         puts count if @verbose
-        self.generate_cloud(count)
+        tokens = self.calculate_sizes(count)
+        if false
+          return self.write_html_simple(tokens)
+        end
+        self.spiral_pack(tokens)
       rescue ArgumentError => e
         raise e
       else
