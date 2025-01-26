@@ -4,7 +4,7 @@ require_relative "ttfmetrics"
 module Wordgraph
   class Core
     def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", 
-                    overwrite: false, seed: nil, nlargest: nil, font: "times")
+                    overwrite: false, seed: nil, nlargest: nil, font: "", ttc: 0)
       @files = files
       @verbose = verbose
       @output_directory = output_directory
@@ -15,13 +15,9 @@ module Wordgraph
       @max_size = 20
       @min_font_size = 12;
       @max_font_size = 48;
-      @font_n = font.downcase
-      # TODO: turn below into params
-      # @font = "fonts/truetype/lato/Lato-Regular.ttf"
-      @font = "fonts/truetype/Iosevka-Bold.ttc" # Mono font. 1 = Term
-      # @font = "fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
-      @ttc_index = 0
-      @metrics = TTFMetrics.new(@font, @ttc_index)
+      @font = font
+      @ttc = ttc
+      @metrics = TTFMetrics.new(@font, @ttc)
       @font_name = @metrics.font_name # e.g. Iosevka Bold
       @font_family = @metrics.font_family # e.g. Iosevka
       if @verbose
@@ -46,7 +42,7 @@ module Wordgraph
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
       # TODO: logarithmic function for larger texts
-      tokens = tokens.sort_by { |_,v| -v }.first(@nlargest).to_h if @nlargest
+      tokens = tokens.sort_by { |_, v| -v }.yield_self { |t| @nlargest ? t.take(@nlargest) : t }.to_h
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
@@ -54,9 +50,11 @@ module Wordgraph
         size = count <= min_count ? 
           1 : 
           [((@max_size * (count - min_count)) / max_sub_min).ceil, 1].max
+        fs = Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, size).floor
         tokens[token] = {
           count: count,
-          size: size
+          size: size,
+          fs: fs
         }
       end
       tokens
@@ -73,7 +71,7 @@ module Wordgraph
     end
 
     def get_font_face
-      locals = [@font_name, @font_family, @font_family.split.first.strip].uniq.map do |s|
+      locals = [@font_name, @font_family, @font_family.split.first].uniq.map do |s|
         "\n\tlocal(\"#{s}\")"
       end
       # Appending url (download source) just in case, probably futile for ttc
@@ -159,8 +157,9 @@ module Wordgraph
     end
 
     def spiral_pack(tokens)
-      tokens.each { |token, v| @metrics.measure_token(token, 
-      Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor, v[:count]) } 
+      tokens.each do |token, v|
+        @metrics.measure_token(token, v[:fs], v[:count]) 
+      end
     end
 
     def process_lines(lines)

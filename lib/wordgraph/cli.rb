@@ -6,7 +6,13 @@ require_relative "core"
 module Wordgraph
   class CLI
     def initialize
-      @options = {}
+      # font: "fonts/truetype/lato/Lato-Regular.ttf"
+      # font: "fonts/truetype/Iosevka-Regular.ttc" # Mono font, ttc index 1 = Term
+      # font: "fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
+      @options = {
+        font: "fonts/truetype/Iosevka-Regular.ttc", # Mono font, ttc index 1 = Term
+        ttc: 1
+      }
     end
 
     def parse(args)
@@ -45,10 +51,12 @@ module Wordgraph
           @options[:nlargest] = nlargest
         end
 
-        opts.on("--font=STRING", ["times", "georgia", "garamond", "arial", 
-                "helvetica", "verdana", "courier", "cursive", "papyrus"], 
-                "Use a web safe font", String) do |font|
+        opts.on("--font=STRING", "E.g. fonts/truetype/Iosevka-Regular.ttc", String) do |font|
           @options[:font] = font
+        end
+
+        opts.on("--ttc=INTEGER", "Optional index into .ttc file", Integer) do |ttc_index|
+          @options[:ttc] = ttc_index
         end
       end
 

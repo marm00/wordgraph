@@ -3,8 +3,9 @@ require "ttfunk"
 module Wordgraph
   class TTFMetrics
     attr_reader :font_name, :font_family
+    
     def initialize(path, ttc_index=0)
-      raise ArgumentError, "File not found: #{path}" unless File.exist?(path)
+      raise ArgumentError, "File not found: #{path.empty? ? "[EMPTY STRING]" : path}" unless File.exist?(path)
       @file = path =~ /\.ttc\z/i ? 
         TTFunk::File.from_ttc(path, ttc_index) : 
         TTFunk::File.open(path)
