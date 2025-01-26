@@ -2,6 +2,7 @@ require "ttfunk"
 
 module Wordgraph
   class TTFMetrics
+    attr_reader :font_name, :font_family
     def initialize(path, ttc_index=0)
       raise ArgumentError, "File not found: #{path}" unless File.exist?(path)
       @file = path =~ /\.ttc\z/i ? 
@@ -10,6 +11,8 @@ module Wordgraph
       @units_per_em = @file.header.units_per_em
       @hmtx = @file.horizontal_metrics
       @cache = Hash.new { |h, k| h[k] = {} }
+      @font_name = @file.name.font_name.first
+      @font_family = @file.name.font_family.first
     end
 
     def measure_token(token, font_size, occurence)

@@ -15,13 +15,15 @@ module Wordgraph
       @max_size = 20
       @min_font_size = 12;
       @max_font_size = 48;
-      @font_name = font.downcase
+      @font_n = font.downcase
       # TODO: turn below into params
-      # @font = "/usr/share/fonts/truetype/lato/Lato-Regular.ttf"
-      # @font = "/usr/share/fonts/truetype/Iosevka-Regular.ttc" # Mono font. 1 = Term
-      @font = "/usr/share/fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
-      @ttc_index = 1
+      # @font = "fonts/truetype/lato/Lato-Regular.ttf"
+      @font = "fonts/truetype/Iosevka-Bold.ttc" # Mono font. 1 = Term
+      # @font = "fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
+      @ttc_index = 0
       @metrics = TTFMetrics.new(@font, @ttc_index)
+      @font_name = @metrics.font_name # e.g. Iosevka Bold
+      @font_family = @metrics.font_family # e.g. Iosevka
       if @verbose
         puts "Proceeding with settings:"
         self.instance_variables.each do |var|
@@ -70,6 +72,14 @@ module Wordgraph
       out
     end
 
+    def get_font_face
+      locals = [@font_name, @font_family, @font_family.split.first.strip].uniq.map do |s|
+        "\n\tlocal(\"#{s}\")"
+      end
+      # Appending url (download source) just in case, probably futile for ttc
+      "#{locals.join(',')},\n\turl(\"#{@font}\")"
+    end
+
     def write_html_simple(tokens)
       out = self.get_path
       File.open(out, File::RDWR | File::CREAT) do |f|
@@ -97,6 +107,10 @@ module Wordgraph
             }.join("\n\s\s")}
           </body>
           <style>
+            @font-face {
+              font-family: "#{@font_family}";
+              src: #{get_font_face};
+            }
             body {
               display: flex;
               flex-wrap: wrap;
@@ -107,7 +121,7 @@ module Wordgraph
               line-height: 1.6;
               margin: 0;
               padding: 20px;
-              font-family: #{@font_name};
+              font-family: "#{@font_family}";
             }
             span {
               display: inline-block;
@@ -123,10 +137,10 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
-    
+
     def rmagick_metrics(tokens)
       glyph = Magick::Draw.new
-      glyph.font = @font_name
+      glyph.font = @font_n
       glyph.fill = 'white'
       glyph.stroke = ''
       tokens.each do |token, v|

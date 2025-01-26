@@ -12,6 +12,7 @@ you need to supply a font (`.ttf`, `.otf`, `.ttc`) file. You can likely find one
 - Linux: */usr/share/fonts/* or *~/.fonts*
 - Windows: *C:\Windows\Fonts*
 - MacOS: */System/Library/Fonts* or */Library/Fonts*
+- WSL: If you view the HTML in the same WSL environment, one option is to host a server inside WSL with a symlink to the fonts.
 
 ## Installation
 
