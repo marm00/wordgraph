@@ -93,12 +93,11 @@ module Wordgraph
           </head>
           <body>
             #{tokens.to_a.shuffle(random: Random.new(*@seed)).map { |k, v|
-              fs = Mathwg::remap(1, @max_size, @min_font_size, @max_font_size, v[:size]).floor
               title = "#{v[:count].to_s} occurrence#{(v[:count] > 1 ) ? "s" : ""}"
               <<~HTML.strip
                 <span
                     title='#{title}'
-                    style='font-size: #{fs}px;'
+                    style='font-size: #{v[:fs]}px;'
                     aria-role='listitem'
                     aria-label='#{title}'>#{k}</span>
               HTML
@@ -157,9 +156,11 @@ module Wordgraph
     end
 
     def spiral_pack(tokens)
+      # Tokens are already descendingly sorted by count
       tokens.each do |token, v|
         @metrics.measure_token(token, v[:fs], v[:count]) 
       end
+      puts (Mathwg::Vector2.new(0.5, 0.5)).setLen(10).x
     end
 
     def process_lines(lines)
