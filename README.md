@@ -4,11 +4,14 @@ TODO: Description
 
 ## Prerequisities
 
-### ImageMagick
+### Fonts
 
-- Version 7.1.1 or later (7.x.x). Required for RMagick (version 6.1 or later).
+This gem uses [TTFunk](https://github.com/prawnpdf/ttfunk) to calculate token bounding boxes,
+you need to supply a font (`.ttf`, `.otf`, `.ttc`) file. You can likely find one here:
 
-You can get ImageMagick from <https://imagemagick.org/script/download.php>.
+- Linux: */usr/share/fonts/* or *~/.fonts*
+- Windows: *C:\Windows\Fonts*
+- MacOS: */System/Library/Fonts* or */Library/Fonts*
 
 ## Installation
 

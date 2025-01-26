@@ -1,5 +1,3 @@
-require "rmagick"
-require "ttfunk"
 require_relative "mathwg"
 require_relative "ttfmetrics"
 
@@ -20,7 +18,8 @@ module Wordgraph
       @font_name = font.downcase
       # TODO: turn below into params
       # @font = "/usr/share/fonts/truetype/lato/Lato-Regular.ttf"
-      @font = "/usr/share/fonts/truetype/Iosevka-Regular.ttc" # Mono font. 1 = Term
+      # @font = "/usr/share/fonts/truetype/Iosevka-Regular.ttc" # Mono font. 1 = Term
+      @font = "/usr/share/fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
       @ttc_index = 1
       @metrics = TTFMetrics.new(@font, @ttc_index)
       if @verbose
@@ -45,7 +44,7 @@ module Wordgraph
       raise ArgumentError, "Empty tokens map" unless tokens.length > 0
       # Linear normalization
       # TODO: logarithmic function for larger texts
-      tokens = tokens.sort_by { |_,v| -v }.first(@nlargest).to_h
+      tokens = tokens.sort_by { |_,v| -v }.first(@nlargest).to_h if @nlargest
       min_count = tokens.values.min
       max_count = tokens.values.max
       max_sub_min = [max_count - min_count, 1].max
@@ -124,7 +123,7 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
-    # TODO: remove rmagick dependency
+    
     def rmagick_metrics(tokens)
       glyph = Magick::Draw.new
       glyph.font = @font_name

@@ -29,7 +29,5 @@ Gem::Specification.new do |spec|
   spec.executables = %w(wordgraph)
   spec.require_paths = %w(lib)
 
-  spec.requirements << "ImageMagick #{Wordgraph::MIN_IM_VERSION} or later"
-
   spec.add_dependency "optparse", "~> 0.6.0"
 end
