@@ -1,8 +1,9 @@
-require_relative "mathwg"
 require_relative "ttfmetrics"
 
 module Wordgraph
   class Core
+    include Mathwg
+    
     def initialize(files, verbose: false, output_directory: Dir.pwd, name: "wordgraph", 
                     overwrite: false, seed: nil, nlargest: nil, font: "", ttc: 0)
       @files = files
@@ -35,6 +36,7 @@ module Wordgraph
       word = word.sub(/^[\.,;:!?'"`(\[\{<]+/, "")
       # Strip trailing punctuation at word end
       word = word.sub(/[\.,;:!?'"`)\]\}>]+$/, "")
+      # TODO: optionally things like stopword removal/stemming
     end
 
     def calculate_sizes(tokens)
@@ -157,10 +159,71 @@ module Wordgraph
 
     def spiral_pack(tokens)
       # Tokens are already descendingly sorted by count
+      # Not using hierarchical bounding boxes so we can derive the total area as is
+      canvas_area = 0
       tokens.each do |token, v|
-        @metrics.measure_token(token, v[:fs], v[:count]) 
+        rect = @metrics.measure_token(token, v[:fs], v[:count]) 
+        canvas_area += rect.area
+        v[:rect] = rect
       end
-      puts (Mathwg::Vector2.new(0.5, 0.5)).setLen(10).x
+      aspect_ratio = 16, 9
+      aspect_total = aspect_ratio.sum.to_f
+      canvas_width = (aspect_ratio[0] / aspect_total) * canvas_area
+      canvas_height = canvas_area - canvas_width
+
+      def step_generator(spiral_point)
+        return enum_for(:step_generator, spiral_point) unless block_given?
+        step_size = 5
+        directions = [Vector2::east, Vector2::south, Vector2::west, Vector2::north]
+        directions = directions.map { |v| v*step_size }
+        steps = 1
+        dir_index = 0
+        loop do
+          2.times do # 1x East -> 1x South
+            next_dir = directions[dir_index]
+            steps.times do # nx West -> nx North
+              yield spiral_point.dup
+              spiral_point += next_dir
+            end
+            dir_index = (dir_index + 1) % 4
+          end
+          steps += 1
+        end
+      end
+
+      # Start at center
+      # n^2 collision checks for now
+      start_spiral = Vector2.new(canvas_width / 2, canvas_height / 2)
+      placed = []
+      tokens.each_value do |v|
+        a = v[:rect]
+        latest_collision = nil
+        spiral = step_generator(start_spiral)
+        begin
+          loop do
+            step = spiral.next
+            # Stay within canvas bounds
+            next unless step.x >= 0 && step.y >= 0 &&
+                        (step.x + a.width) <= canvas_width &&
+                        (step.y + a.height) <= canvas_height
+            # Cache the latest hit (most likely to still hit)
+            temp_a = a.dup
+            temp_a.place(step)
+            next if latest_collision&.intersects?(a)
+            collision = placed.any? do |b|
+              temp_a.intersects?(b).tap { |collides| latest_collision = b if collides }
+            end
+            unless collision
+              a.place(step)
+              placed << temp_a
+              break
+            end
+          end
+        rescue StopIteration
+          puts "No space remaining for #{a}"
+        end
+      end
+      puts placed
     end
 
     def process_lines(lines)

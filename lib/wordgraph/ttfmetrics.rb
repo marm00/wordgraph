@@ -1,7 +1,10 @@
 require "ttfunk"
+require_relative "mathwg"
 
 module Wordgraph
   class TTFMetrics
+    include Mathwg
+    
     attr_reader :font_name, :font_family
     
     def initialize(path, ttc_index=0)
@@ -22,8 +25,8 @@ module Wordgraph
       # Height is the same for every glyph grouped by font_size, using approximate scalar.
       # TODO: check if scalar is accurate
       height = font_size * 1.2
-      puts "#{token} #{occurence} #{font_size} #{width} #{height}"
-      return [width, height]
+      puts "#{token} #{occurence} #{font_size} #{width} #{height} #{width*height}"
+      Rect.new(width.round, height.round)
     end
 
     def measure_char(char, scale)
