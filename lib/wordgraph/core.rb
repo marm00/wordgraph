@@ -136,6 +136,57 @@ module Wordgraph
       puts File.read(out) if @verbose
     end
 
+    def write_html_spiral(canvas, tokens)
+      out = self.get_path
+      File.open(out, File::RDWR | File::CREAT) do |f|
+        f.flock(File::LOCK_EX)
+        f.truncate(0)
+        document_setup = <<~HTML
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>wordgraph</title>
+          </head>
+          <body>
+            <svg width="#{canvas[1]}" height="#{canvas[2]}">
+              <g transform="translate(0, 0)">
+                #{tokens.map do |k, v|
+                title = "#{v[:count].to_s} occurrence#{(v[:count] > 1 ) ? "s" : ""}"
+                <<~HTML.strip
+                <text
+                    transform="translate(#{v[:rect].min.x.round}, #{v[:rect].max.y.round})"
+                    text-anchor="middle"
+                    style="font-size: #{v[:fs]}px;">#{k}<title>#{title}</title></text>
+                HTML
+                end.join("\n")}
+              </g>
+            </svg>
+          </body>
+          <style>
+            @font-face {
+              font-family: "#{@font_family}";
+              src: #{get_font_face};
+            }
+            body {
+              background-color: #000;
+              color: #FFFFFF;
+              margin: 0;
+              padding: 20px;
+              font-family: "#{@font_family}";
+            }
+            text {
+              fill: #FFFFFF;
+            }
+          </style>
+          </html>
+        HTML
+        f.write(document_setup)
+      end
+      puts File.read(out) if @verbose
+    end
+
 
     def rmagick_metrics(tokens)
       glyph = Magick::Draw.new
@@ -170,6 +221,7 @@ module Wordgraph
       aspect_total = aspect_ratio.sum.to_f
       canvas_width = (aspect_ratio[0] / aspect_total) * canvas_area
       canvas_height = canvas_area - canvas_width
+      canvas = [aspect_ratio, canvas_width, canvas_height]
 
       def step_generator(spiral_point)
         return enum_for(:step_generator, spiral_point) unless block_given?
@@ -224,6 +276,7 @@ module Wordgraph
         end
       end
       puts placed
+      canvas
     end
 
     def process_lines(lines)
@@ -241,7 +294,8 @@ module Wordgraph
         if false
           return self.write_html_simple(tokens)
         end
-        self.spiral_pack(tokens)
+        canvas = self.spiral_pack(tokens)
+        self.write_html_spiral(canvas, tokens)
       rescue ArgumentError => e
         raise e
       else
