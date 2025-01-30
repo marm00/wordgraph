@@ -13,7 +13,7 @@ module Wordgraph
     end
 
     class Rect
-      attr_reader :area, :min, :max, :width, :height, :vertices
+      attr_reader :area, :min, :max, :width, :height, :vertices, :halfWidth, :halfHeight
 
       def initialize(width, height)
         @width = width

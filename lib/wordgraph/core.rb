@@ -150,7 +150,7 @@ module Wordgraph
               <title>wordgraph</title>
           </head>
           <body>
-            <svg width="#{canvas[1]}" height="#{canvas[2]}">
+            <svg width="#{canvas[1].round}" height="#{canvas[2].round}">
               <!-- <g transform="translate(#{(canvas[1]/2.0).floor}, #{(canvas[2]/2.0).floor})"> !-->
               <g transform="translate(0, 0)">
                 #{tokens.map do |k, v|
@@ -163,7 +163,7 @@ module Wordgraph
                     _height="#{v[:rect].height}"
                     text-anchor="start"
                     fill="#{'#%06x' % rand(0x001500..0xFFFFFF)}"
-                    style="font-size: #{v[:fs]}px;">#{k}<title>#{title}</title></text>
+                    font-size="#{v[:fs]}px">#{k}<title>#{title}</title></text>
                 HTML
                 end.join("\n")}
               </g>
@@ -257,9 +257,10 @@ module Wordgraph
           loop do
             step = spiral.next
             # Stay within canvas bounds
-            next unless step.x >= 0 && step.y >= 0 &&
-                        (step.x + a.width) <= canvas_width &&
-                        (step.y + a.height) <= canvas_height
+            next unless (step.x - a.halfWidth) >= 0 && 
+                        (step.y - a.halfHeight) >= 0 &&
+                        (step.x + a.halfWidth) <= canvas_width &&
+                        (step.y + a.halfHeight) <= canvas_height
             # Cache the latest hit (most likely to still hit)
             temp_a = a.dup
             temp_a.place(step)
