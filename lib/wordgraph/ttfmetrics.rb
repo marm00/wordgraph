@@ -12,19 +12,19 @@ module Wordgraph
       @file = path =~ /\.ttc\z/i ? 
         TTFunk::File.from_ttc(path, ttc_index) : 
         TTFunk::File.open(path)
-      @units_per_em = @file.header.units_per_em
-      @hmtx = @file.horizontal_metrics
-      @cache = Hash.new { |h, k| h[k] = {} }
       @font_name = @file.name.font_name.first
       @font_family = @file.name.font_family.first
+      @hmtx = @file.horizontal_metrics
+      @units_per_em = @file.header.units_per_em
+      @font_height = @file.ascent - @file.descent
+      @cache = Hash.new { |h, k| h[k] = {} }
     end
 
     def measure_token(token, font_size, occurence)
       scale = font_size.to_f / @units_per_em
       width = token.chars.sum { |c| measure_char(c, scale) }
-      # Height is the same for every glyph grouped by font_size, using approximate scalar.
-      # TODO: check if scalar is accurate
-      height = font_size * 1.2
+      # Height is the same for every glyph grouped by font_size/scale (px conversion)
+      height = @font_height * scale
       puts "#{token} #{occurence} #{font_size} #{width} #{height} #{width*height}"
       Rect.new(width.round, height.round)
     end

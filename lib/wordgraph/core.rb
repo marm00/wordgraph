@@ -158,7 +158,7 @@ module Wordgraph
                 <<~HTML.strip
                 <text
                     transform="translate(#{v[:rect].min.x.round}, #{v[:rect].max.y.round})"
-                    text-anchor="middle"
+                    text-anchor="start"
                     style="font-size: #{v[:fs]}px;">#{k}<title>#{title}</title></text>
                 HTML
                 end.join("\n")}
