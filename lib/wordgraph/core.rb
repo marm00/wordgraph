@@ -14,8 +14,8 @@ module Wordgraph
       @seed = seed
       @nlargest = nlargest
       @max_size = 20
-      @min_font_size = 12;
-      @max_font_size = 48;
+      @min_font_size = 18;
+      @max_font_size = 72;
       @font = font
       @ttc = ttc
       @metrics = TTFMetrics.new(@font, @ttc)
@@ -157,8 +157,12 @@ module Wordgraph
                 title = "#{v[:count].to_s} occurrence#{(v[:count] > 1 ) ? "s" : ""}"
                 <<~HTML.strip
                 <text
-                    transform="translate(#{v[:rect].min.x.round}, #{v[:rect].max.y.round})"
+                    x="#{v[:rect].min.x.round}"
+                    y="#{v[:rect].max.y.round}"
+                    _width="#{v[:rect].width}"
+                    _height="#{v[:rect].height}"
                     text-anchor="start"
+                    fill="#{'#%06x' % rand(0x001500..0xFFFFFF)}"
                     style="font-size: #{v[:fs]}px;">#{k}<title>#{title}</title></text>
                 HTML
                 end.join("\n")}
@@ -172,13 +176,9 @@ module Wordgraph
             }
             body {
               background-color: #000;
-              color: #FFFFFF;
               margin: 0;
               padding: 0;
               font-family: "#{@font_family}";
-            }
-            text {
-              fill: #FFFFFF;
             }
           </style>
           </html>
@@ -227,7 +227,7 @@ module Wordgraph
 
       def step_generator(spiral_point)
         return enum_for(:step_generator, spiral_point) unless block_given?
-        step_size = 5
+        step_size = 1
         directions = [Vector2::east, Vector2::south, Vector2::west, Vector2::north]
         directions = directions.map { |v| v*step_size }
         steps = 1

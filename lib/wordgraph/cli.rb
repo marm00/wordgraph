@@ -6,9 +6,9 @@ require_relative "core"
 module Wordgraph
   class CLI
     def initialize
-      # font: "fonts/truetype/lato/Lato-Regular.ttf"
-      # font: "fonts/truetype/Iosevka-Regular.ttc" # Mono font, ttc index 1 = Term
-      # font: "fonts/opentype/urw-base35/NimbusRoman-Regular.otf"
+      # font: "fonts/truetype/lato/Lato-Regular.ttf",
+      # font: "fonts/truetype/Iosevka-Regular.ttc", # Mono font, ttc index 1 = Term
+      # font: "fonts/opentype/urw-base35/NimbusRoman-Regular.otf",
       @options = {
         font: "fonts/truetype/Iosevka-Regular.ttc", # Mono font, ttc index 1 = Term
         ttc: 1

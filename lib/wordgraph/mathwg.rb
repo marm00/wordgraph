@@ -18,8 +18,8 @@ module Wordgraph
       def initialize(width, height)
         @width = width
         @height = height
-        @halfWidth = width / 2
-        @halfHeight = height / 2
+        @halfWidth = width / 2.0
+        @halfHeight = height / 2.0
         @area = width * height
         @min = Vector2.new
         @max = Vector2.new
@@ -57,7 +57,7 @@ module Wordgraph
     class Vector2
       attr_accessor :x, :y
 
-      def initialize(x=0, y=0)
+      def initialize(x=0.0, y=0.0)
         @x = x
         @y = y
       end
