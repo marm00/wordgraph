@@ -50,7 +50,7 @@ module Wordgraph
       end
 
       def to_s
-        "Rect(#{@width}, #{@height}, #{@min}, #{@max})"
+        "Rect(#{@width}, #{@height}, \n\s#{@vertices.map {|v| v.to_s}.join(",\n\s")})"
       end
     end
 

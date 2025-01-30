@@ -151,6 +151,7 @@ module Wordgraph
           </head>
           <body>
             <svg width="#{canvas[1]}" height="#{canvas[2]}">
+              <!-- <g transform="translate(#{(canvas[1]/2.0).floor}, #{(canvas[2]/2.0).floor})"> !-->
               <g transform="translate(0, 0)">
                 #{tokens.map do |k, v|
                 title = "#{v[:count].to_s} occurrence#{(v[:count] > 1 ) ? "s" : ""}"
@@ -173,7 +174,7 @@ module Wordgraph
               background-color: #000;
               color: #FFFFFF;
               margin: 0;
-              padding: 20px;
+              padding: 0;
               font-family: "#{@font_family}";
             }
             text {
@@ -218,9 +219,10 @@ module Wordgraph
         v[:rect] = rect
       end
       aspect_ratio = 16, 9
-      aspect_total = aspect_ratio.sum.to_f
-      canvas_width = (aspect_ratio[0] / aspect_total) * canvas_area
-      canvas_height = canvas_area - canvas_width
+      r = aspect_ratio[0] / aspect_ratio[1].to_f
+      ease = 30
+      canvas_width = Math.sqrt(canvas_area * r) + ease * r
+      canvas_height = Math.sqrt(canvas_area / r) + ease
       canvas = [aspect_ratio, canvas_width, canvas_height]
 
       def step_generator(spiral_point)
@@ -245,7 +247,7 @@ module Wordgraph
 
       # Start at center
       # n^2 collision checks for now
-      start_spiral = Vector2.new(canvas_width / 2, canvas_height / 2)
+      start_spiral = Vector2.new(canvas_width / 2.0, canvas_height / 2.0)
       placed = []
       tokens.each_value do |v|
         a = v[:rect]
